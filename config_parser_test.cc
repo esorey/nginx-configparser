@@ -36,6 +36,12 @@ TEST_F(NginxStringConfigTest, SimpleConfig) {
 	EXPECT_TRUE(ParseString("foo bar;")) << "Didn't parse successfully";
 	EXPECT_EQ(1, config_.statements_.size()) << "Didn't get one statement.";
 	EXPECT_EQ("foo", config_.statements_.at(0)->tokens_.at(0));
+
+	EXPECT_TRUE(ParseString("foo { bar; }")) 
+	<< "Didn't parse valid config correctly.";
+	EXPECT_EQ(2, config_.statements_.size()) 
+	<< "Didn't get five statements.";
+	EXPECT_EQ("foo", config_.statements_.at(0)->tokens_.at(0));
 }
 
 TEST_F(NginxStringConfigTest, EmptyConfig) {
@@ -63,4 +69,11 @@ TEST_F(NginxStringConfigTest, TwoBlocksConfig) {
 		<< "Triple nested config parsed incorrectly.";
 		EXPECT_TRUE(ParseString("foo { bar { baz qux; } } baz { qux; }"))
 		<< "Triple nested config parsed incorrectly.";
+}
+
+TEST_F(NginxStringConfigTest, BadSyntaxConfig) {
+	EXPECT_FALSE(ParseString("foo {")) 
+	<< "Correctly parsed config with no closing bracket.";
+	EXPECT_FALSE(ParseString("foo")) 
+	<< "Correctly parsed config with missing semicolon.";
 }
